@@ -15,6 +15,10 @@ void main() {
     ..license = 'apache'
     ..rootPath = topDir
     ..doc = 'Package with libraries supporting the Thrift protocol'
+    ..testLibraries = [
+      library('test_protocol'),
+      library('test_transport'),
+    ]
     ..libraries = [
       library('protocol')
       ..imports = [ 'package:thrift/protocol.dart' ]
