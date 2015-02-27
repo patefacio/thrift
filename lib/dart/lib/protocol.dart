@@ -1,6 +1,6 @@
 library thrift.protocol;
 
-import 'package:thrift/protocol.dart';
+import 'package:thrift/transport.dart';
 // custom <additional imports>
 // end <additional imports>
 

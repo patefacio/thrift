@@ -8,7 +8,11 @@ tetTimedOut,
 tetEndOfFile
 }
 
-class TTransportException extends Exception {
+class TTransportException
+  implements Exception {
+  const TTransportException(this.message);
+
+  final String message;
   // custom <class TTransportException>
   // end <class TTransportException>
 }
@@ -24,6 +28,24 @@ abstract class TTransport {
   void flush();
 
   // end <class TTransport>
+}
+
+abstract class TTransportFactory {
+  // custom <class TTransportFactory>
+
+  TTransport wrapTransport(TTransport);
+
+  // end <class TTransportFactory>
+}
+
+abstract class TServerTransport {
+  // custom <class TServerTransport>
+
+  TTransport accept();
+  void close();
+  void listen();
+
+  // end <class TServerTransport>
 }
 // custom <part transport>
 // end <part transport>

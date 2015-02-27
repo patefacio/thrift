@@ -1,5 +1,6 @@
 library thrift.transport;
 
+import 'dart:io';
 // custom <additional imports>
 // end <additional imports>
 

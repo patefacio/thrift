@@ -21,7 +21,7 @@ void main() {
     ]
     ..libraries = [
       library('protocol')
-      ..imports = [ 'package:thrift/protocol.dart' ]
+      ..imports = [ 'package:thrift/transport.dart' ]
       ..parts = [
         part('protocol')
         ..enums = [
@@ -72,29 +72,65 @@ void main() {
             member('name'),
             member('type')..type = 'int',
           ],
-          class_('t_protocol_base')
-          ..isAbstract = true
-          ..members = [
-            member('trans')..type = 'TTransport'..ctors = ['']
-          ],
+          class_('t_protocol')..isAbstract = true,
+          class_('t_protocol_factory')..isAbstract = true,
         ],
         part('binary')
-        ..classes = [ class_('t_binary_protocol')..implement = [ 'TProtocolBase' ] ],
+        ..classes = [
+          class_('t_binary_protocol')..implement = [ 'TProtocol' ]
+          ..members = [
+            member('transport')..type = 'TTransport'..access = RO..ctors = ['']
+          ]
+        ],
         part('compact')
-        ..classes = [ class_('t_compact_protocol')..implement = [ 'TProtocolBase' ] ],
+        ..classes = [
+          class_('t_compact_protocol')..implement = [ 'TProtocol' ]
+          ..members = [
+            member('transport')..type = 'TTransport'..access = RO..ctors = ['']
+          ]
+        ],
         part('json')
-        ..classes = [ class_('t_json_protocol')..implement = [ 'TProtocolBase' ] ],
+        ..classes = [
+          class_('t_json_protocol')..implement = [ 'TProtocol' ]
+          ..members = [
+            member('transport')..type = 'TTransport'..access = RO..ctors = ['']
+          ]
+        ],
       ],
       library('server')
+      ..imports = [
+        'package:thrift/protocol.dart',
+        'package:thrift/transport.dart',
+      ]
       ..parts = [
+        part('server')
+        ..classes = [
+          class_('t_processor')
+          ..isAbstract = true,
+          class_('t_server')
+          ..isAbstract = true,
+        ],
         part('blocking')
-        ..classes = [ class_('t_server') ],
+        ..classes = [
+          class_('t_simple_server')
+          ..implement = [ 'TServer' ]
+          ..members = [
+            member('processor')..type = 'TProcessor'..access = RO..ctors = [''],
+            member('server_transport')..type = 'TServerTransport'..access = RO..ctors = [''],
+            member('transport_factory')..type = 'TTransportFactory'..access = RO..ctorsOpt = [''],
+            member('protocol_factory')..type = 'TProtocolFactory'..access = RO..ctorsOpt = [''],
+            member('is_serving')..classInit = false..access = RO,
+          ]
+        ],
         part('non_blocking')
         ..classes = [ class_('t_non_blocking_server') ],
         part('http')
         ..classes = [ class_('t_http_server') ],
       ],
       library('transport')
+      ..imports = [
+        'io',
+      ]
       ..parts = [
         part('transport')
         ..enums = [
@@ -105,17 +141,30 @@ void main() {
         ]
         ..classes = [
           class_('t_transport_exception')
-          ..extend = 'Exception',
-          class_('t_transport')..isAbstract = true
+          ..implement = ['Exception']
+          ..immutable = true
+          ..members = [
+            member('message')
+          ],
+          class_('t_transport')..isAbstract = true,
+          class_('t_transport_factory')..isAbstract = true,
+          class_('t_server_transport')..isAbstract = true,
         ],
         part('socket_transport')
         ..classes = [
           class_('t_socket')
           ..extend = 'TTransport'
           ..members = [
-            member('host')..ctors = [''],
-            member('port')..type = 'int'..ctors = [''],
+            member('host'),
+            member('port')..type = 'int',
+            member('is_open')..access = RO..classInit = false,
+            member('socket')..access = IA..type = 'Socket',
           ],
+          class_('t_server_socket')
+          ..implement = [ 'TServerTransport' ]
+          ..members = [
+            member('server_socket')..access = IA..type = 'ServerSocket',
+          ]
         ],
         part('ssl_socket_transport'),
         part('framed_transport'),

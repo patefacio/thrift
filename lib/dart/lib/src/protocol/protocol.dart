@@ -80,11 +80,10 @@ class TField {
   // end <class TField>
 }
 
-abstract class TProtocolBase {
-  TProtocolBase(this.trans);
+abstract class TProtocol {
+  // custom <class TProtocol>
 
-  TTransport trans;
-  // custom <class TProtocolBase>
+  TTransport get transport;
 
   bool readBool();
   int readByte();
@@ -128,8 +127,15 @@ abstract class TProtocolBase {
   void writeStructBegin(TStruct);
   void writeStructEnd();
 
+  // end <class TProtocol>
+}
 
-  // end <class TProtocolBase>
+abstract class TProtocolFactory {
+  // custom <class TProtocolFactory>
+
+  TProtocol createProtocol(TTransport);
+
+  // end <class TProtocolFactory>
 }
 // custom <part protocol>
 // end <part protocol>
