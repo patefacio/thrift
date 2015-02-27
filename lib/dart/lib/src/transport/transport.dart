@@ -1,15 +1,14 @@
 part of thrift.transport;
 
 enum TExceptionType {
-tetUnknown,
-tetNotOpen,
-tetAlreadyOpen,
-tetTimedOut,
-tetEndOfFile
+  tetUnknown,
+  tetNotOpen,
+  tetAlreadyOpen,
+  tetTimedOut,
+  tetEndOfFile
 }
 
-class TTransportException
-  implements Exception {
+class TTransportException implements Exception {
   const TTransportException(this.message);
 
   final String message;
@@ -30,10 +29,10 @@ abstract class TTransport {
   // end <class TTransport>
 }
 
-abstract class TTransportFactory {
+class TTransportFactory {
   // custom <class TTransportFactory>
 
-  TTransport wrapTransport(TTransport);
+  TTransport wrapTransport(TTransport transport) => transport;
 
   // end <class TTransportFactory>
 }
@@ -41,9 +40,21 @@ abstract class TTransportFactory {
 abstract class TServerTransport {
   // custom <class TServerTransport>
 
-  TTransport accept();
+  TTransport accept() {
+    final TTransport result = _accept();
+    if (result == null) {
+      throw new TTransportException('_accept() may not return null');
+    }
+    return result;
+  }
+
+  TTransport _accept();
+
   void close();
   void listen();
+
+  /// *optional* interrupt method
+  void interrupt() {}
 
   // end <class TServerTransport>
 }

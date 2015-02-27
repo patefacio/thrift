@@ -18,6 +18,11 @@ dev_dependencies:
 
 dependency_overrides:
 # custom <thrift dependency overrides>
+
+  ebisu:
+    path: /home/dbdavidson/dev/open_source/ebisu    
+    #git: git://github.com/patefacio/ebisu
+
 # end <thrift dependency overrides>
 
 transformers:

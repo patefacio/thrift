@@ -10,6 +10,7 @@ void main() {
       print("${r.loggerName} [${r.level}]:\t${r.message}"));
   String here = path.absolute(Platform.script.path);
   final topDir = path.dirname(path.dirname(here));
+  useDartFormatter = true;
   System ebisu = system('thrift')
     ..includeHop = true
     ..license = 'apache'
@@ -80,7 +81,9 @@ void main() {
           class_('t_binary_protocol')..implement = [ 'TProtocol' ]
           ..members = [
             member('transport')..type = 'TTransport'..access = RO..ctors = ['']
-          ]
+          ],
+          class_('t_binary_protocol_factory')
+          ..implement = ['TProtocolFactory'],
         ],
         part('compact')
         ..classes = [
@@ -107,19 +110,33 @@ void main() {
         ..classes = [
           class_('t_processor')
           ..isAbstract = true,
-          class_('t_server')
+          class_('t_server_args')
+          ..members = ([
+            member('processor')..type = 'TProcessor',
+            member('server_transport')..type = 'TServerTransport',
+            member('input_transport_factory')..type = 'TTransportFactory',
+            member('input_protocol_factory')..type = 'TProtocolFactory',
+            member('output_transport_factory')..type = 'TTransportFactory',
+            member('output_protocol_factory')..type = 'TProtocolFactory',
+          ]..forEach((m) => m.isFinal = true)),
+          class_('t_server_context')
           ..isAbstract = true,
+          class_('t_server_event_handler')
+          ..isAbstract = true,
+          class_('t_server')
+          ..isAbstract = true
+          ..members = [
+            member('args')..type = 'TServerArgs'..access = RO,
+            member('is_serving')..classInit = false..access = RO,
+          ]
         ],
         part('blocking')
         ..classes = [
           class_('t_simple_server')
-          ..implement = [ 'TServer' ]
+          ..extend = 'TServer'
           ..members = [
-            member('processor')..type = 'TProcessor'..access = RO..ctors = [''],
-            member('server_transport')..type = 'TServerTransport'..access = RO..ctors = [''],
-            member('transport_factory')..type = 'TTransportFactory'..access = RO..ctorsOpt = [''],
-            member('protocol_factory')..type = 'TProtocolFactory'..access = RO..ctorsOpt = [''],
-            member('is_serving')..classInit = false..access = RO,
+            member('server_transport')..type = 'TServerTransport'..access = RO,
+            member('is_stopped')..classInit = false..access = RO,
           ]
         ],
         part('non_blocking')
@@ -147,7 +164,7 @@ void main() {
             member('message')
           ],
           class_('t_transport')..isAbstract = true,
-          class_('t_transport_factory')..isAbstract = true,
+          class_('t_transport_factory'),
           class_('t_server_transport')..isAbstract = true,
         ],
         part('socket_transport')
@@ -161,7 +178,7 @@ void main() {
             member('socket')..access = IA..type = 'Socket',
           ],
           class_('t_server_socket')
-          ..implement = [ 'TServerTransport' ]
+          ..extend = 'TServerTransport'
           ..members = [
             member('server_socket')..access = IA..type = 'ServerSocket',
           ]

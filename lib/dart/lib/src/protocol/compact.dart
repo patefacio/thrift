@@ -1,7 +1,6 @@
 part of thrift.protocol;
 
-class TCompactProtocol
-  implements TProtocol {
+class TCompactProtocol implements TProtocol {
   TCompactProtocol(this._transport);
 
   TTransport get transport => _transport;

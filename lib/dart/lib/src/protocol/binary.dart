@@ -1,7 +1,6 @@
 part of thrift.protocol;
 
-class TBinaryProtocol
-  implements TProtocol {
+class TBinaryProtocol implements TProtocol {
   TBinaryProtocol(this._transport);
 
   TTransport get transport => _transport;
@@ -49,9 +48,16 @@ class TBinaryProtocol
   void writeStructBegin(TStruct) => throw 'TBD';
   void writeStructEnd() => throw 'TBD';
 
-
   // end <class TBinaryProtocol>
   TTransport _transport;
+}
+
+class TBinaryProtocolFactory implements TProtocolFactory {
+  // custom <class TBinaryProtocolFactory>
+  
+  TProtocol createProtocol(TTransport) => throw 'TODO';
+  
+  // end <class TBinaryProtocolFactory>
 }
 // custom <part binary>
 // end <part binary>

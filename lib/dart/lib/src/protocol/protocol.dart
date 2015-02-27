@@ -1,27 +1,27 @@
 part of thrift.protocol;
 
 enum TType {
-ttStop,
-ttTrue,
-ttFalse,
-ttByte,
-ttI16,
-ttI32,
-ttI64,
-ttDouble,
-ttBinary,
-ttList,
-ttSet,
-ttMap,
-ttStruct
+  ttStop,
+  ttTrue,
+  ttFalse,
+  ttByte,
+  ttI16,
+  ttI32,
+  ttI64,
+  ttDouble,
+  ttBinary,
+  ttList,
+  ttSet,
+  ttMap,
+  ttStruct
 }
 
 enum TMessageType {
-tmtInvalidMessage,
-tmtCall,
-tmtReply,
-tmtException,
-tmtOneway
+  tmtInvalidMessage,
+  tmtCall,
+  tmtReply,
+  tmtException,
+  tmtOneway
 }
 
 class TList {

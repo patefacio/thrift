@@ -1,7 +1,6 @@
 part of thrift.protocol;
 
-class TJsonProtocol
-  implements TProtocol {
+class TJsonProtocol implements TProtocol {
   TJsonProtocol(this._transport);
 
   TTransport get transport => _transport;

@@ -1,34 +1,31 @@
 part of thrift.server;
 
-class TSimpleServer
-  implements TServer {
-  TSimpleServer(this._processor, this._serverTransport, [ this._transportFactory,
-    this._protocolFactory ]);
-
-  TProcessor get processor => _processor;
+class TSimpleServer extends TServer {
   TServerTransport get serverTransport => _serverTransport;
-  TTransportFactory get transportFactory => _transportFactory;
-  TProtocolFactory get protocolFactory => _protocolFactory;
-  bool get isServing => _isServing;
+  bool get isStopped => _isStopped;
   // custom <class TSimpleServer>
 
-  void serve() {
+  TSimpleServer(TServerArgs args) : super(args);
 
+  void serve() {
+    _serverTransport.listen();
+
+    while (!isStopped) {
+      final client = _serverTransport.accept();
+    }
 
     throw 'TBD';
   }
 
   void stop() {
-
+    _isStopped = true;
+    _serverTransport.interrupt();
     throw 'TBD';
   }
 
   // end <class TSimpleServer>
-  TProcessor _processor;
   TServerTransport _serverTransport;
-  TTransportFactory _transportFactory;
-  TProtocolFactory _protocolFactory;
-  bool _isServing = false;
+  bool _isStopped = false;
 }
 // custom <part blocking>
 // end <part blocking>

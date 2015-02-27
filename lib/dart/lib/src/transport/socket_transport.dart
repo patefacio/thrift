@@ -1,16 +1,14 @@
 part of thrift.transport;
 
 class TSocket extends TTransport {
-  TSocket(this.host, this.port);
-
   String host;
   int port;
   bool get isOpen => _isOpen;
   // custom <class TSocket>
 
-  TSocket(this.host, this.port) : this.withTimeout(this.host, this.port, 0);
+  TSocket(String host, int port) : this.withTimeout(host, port, 0);
 
-  TSocket(this.host, this.port, int timeout);
+  TSocket.withTimeout(this.host, this.port, int timeout);
 
   void open() {
     assert(!isOpen);
@@ -29,19 +27,16 @@ class TSocket extends TTransport {
   Socket _socket;
 }
 
-class TServerSocket
-  implements TServerTransport {
+class TServerSocket extends TServerTransport {
   // custom <class TServerSocket>
 
-  TTransport accept() {
+  void close() => throw 'TODO';
 
-  }
+  void listen() => throw 'TODO';
 
-  void close() {
-  }
+  void interrupt() => throw 'TODO';
 
-  void listen() {
-  }
+  TTransport _accept() => throw 'TODO';
 
   // end <class TServerSocket>
   ServerSocket _serverSocket;
