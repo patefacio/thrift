@@ -16,15 +16,8 @@ class TTransportException implements Exception {
   // end <class TTransportException>
 }
 
-abstract class TTransport {
+abstract class TTransport implements IOSink, Stream {
   // custom <class TTransport>
-
-  bool get isOpen;
-  void open();
-  void close();
-  void read(ByteData);
-  void write(ByteData);
-  void flush();
 
   // end <class TTransport>
 }
@@ -37,7 +30,22 @@ class TTransportFactory {
   // end <class TTransportFactory>
 }
 
+/// Common arguments for server transports
+class TServerTransportArgs {
+  const TServerTransportArgs(this.backlog, this.clientTimeout);
+
+  /// Value of 0 idicates the default will be used
+  final int backlog;
+  final int clientTimeout;
+  // custom <class TServerTransportArgs>
+  // end <class TServerTransportArgs>
+}
+
+/// Object which provides client transports
 abstract class TServerTransport {
+  const TServerTransport(this.args);
+
+  final TServerTransportArgs args;
   // custom <class TServerTransport>
 
   TTransport accept() {

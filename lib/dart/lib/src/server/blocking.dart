@@ -12,6 +12,7 @@ class TSimpleServer extends TServer {
 
     while (!isStopped) {
       final client = _serverTransport.accept();
+      if (client != null) {}
     }
 
     throw 'TBD';

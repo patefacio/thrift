@@ -1,38 +1,46 @@
 part of thrift.transport;
 
 class TSocket extends TTransport {
-  String host;
-  int port;
-  bool get isOpen => _isOpen;
   // custom <class TSocket>
 
-  TSocket(String host, int port) : this.withTimeout(host, port, 0);
+  TSocket(this._socket);
 
-  TSocket.withTimeout(this.host, this.port, int timeout);
+  get port => _socket.port;
+  get host => _socket.address.host;
 
-  void open() {
-    assert(!isOpen);
-    assert(_socket == null);
-
-    throw 'TODO';
-  }
-
-  void close() => throw 'TODO';
-  void read(ByteData) => throw 'TODO';
-  void write(ByteData) => throw 'TODO';
-  void flush() => throw 'TODO';
+  toString() => 'TSocket(host:$host, port: $port)';
 
   // end <class TSocket>
-  bool _isOpen = false;
   Socket _socket;
 }
 
+/// Object which provides client transports using sockets
 class TServerSocket extends TServerTransport {
+  /// Standard server socket providing client sockets to be wrapped as
+  /// transports.
+  ServerSocket get serverSocket => _serverSocket;
   // custom <class TServerSocket>
 
-  void close() => throw 'TODO';
+  static Future<TServerSocket> bind(address, int port,
+      {int backlog: 0, int clientTimeout: 0}) => ServerSocket
+      .bind(address, port, backlog: backlog)
+      .then((ServerSocket serverSocket) => new TServerSocket._(
+          new TServerTransportArgs(backlog, clientTimeout), serverSocket));
 
-  void listen() => throw 'TODO';
+  TServerSocket._(args, this._serverSocket) : super(args);
+
+  close() {
+    _logger.info('Closing socket $_serverSocket');
+    return _serverSocket.close();
+  }
+
+  listen(accept(TTransport)) {
+    _logger.info('Listening on server socket $_serverSocket');
+    _serverSocket.listen((Socket socket) {
+      _logger.info('Got client socket ${socket.address}');
+      accept(new TSocket(socket));
+    });
+  }
 
   void interrupt() => throw 'TODO';
 

@@ -5,39 +5,34 @@ abstract class TProcessor {
   // end <class TProcessor>
 }
 
-class TServerArgs {
-  final TProcessor processor;
-  final TServerTransport serverTransport;
+abstract class TProcessorFactory {
+  // custom <class TProcessorFactory>
+  // end <class TProcessorFactory>
+}
+
+class TServerFactories {
+  final TProcessorFactory processorFactory;
   final TTransportFactory inputTransportFactory;
   final TProtocolFactory inputProtocolFactory;
   final TTransportFactory outputTransportFactory;
   final TProtocolFactory outputProtocolFactory;
-  // custom <class TServerArgs>
-
-  TServerArgs(this.processor, this.serverTransport,
-      [TTransportFactory inputTransportFactory,
-      TProtocolFactory inputProtocolFactory,
-      TTransportFactory outputTransportFactory,
-      TProtocolFactory outputProtocolFactory])
-      : this.inputTransportFactory = inputTransportFactory == null
-          ? new TTransportFactory()
-          : inputTransportFactory,
-        this.outputTransportFactory = outputTransportFactory == null
-            ? new TTransportFactory()
-            : outputTransportFactory,
-        this.inputProtocolFactory = inputProtocolFactory == null
-            ? new TBinaryProtocolFactory()
-            : inputProtocolFactory,
-        this.outputProtocolFactory = outputProtocolFactory == null
-            ? new TBinaryProtocolFactory()
-            : outputProtocolFactory;
-
-  // end <class TServerArgs>
+  // custom <class TServerFactories>
+  // end <class TServerFactories>
 }
 
-abstract class TServerContext {
-  // custom <class TServerContext>
-  // end <class TServerContext>
+class TConnectionContext {
+  const TConnectionContext(this.inputProtocol, this.outputProtocol);
+
+  final TProtocol inputProtocol;
+  final TProtocol outputProtocol;
+  // custom <class TConnectionContext>
+  // end <class TConnectionContext>
+}
+
+class TClientContext {
+  TConnectionContext connectionContext;
+  // custom <class TClientContext>
+  // end <class TClientContext>
 }
 
 abstract class TServerEventHandler {
@@ -55,7 +50,8 @@ abstract class TServerEventHandler {
 }
 
 abstract class TServer {
-  TServerArgs get args => _args;
+  TServerTransport get serverTransport => _serverTransport;
+  TServerFactories get factories => _factories;
   bool get isServing => _isServing;
   // custom <class TServer>
 
@@ -67,7 +63,8 @@ abstract class TServer {
   void stop();
 
   // end <class TServer>
-  TServerArgs _args;
+  TServerTransport _serverTransport;
+  TServerFactories _factories;
   bool _isServing = false;
 }
 // custom <part server>

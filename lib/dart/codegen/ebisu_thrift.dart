@@ -22,6 +22,7 @@ void main() {
     ]
     ..libraries = [
       library('protocol')
+      ..includeLogger = true
       ..imports = [ 'package:thrift/transport.dart' ]
       ..parts = [
         part('protocol')
@@ -101,6 +102,7 @@ void main() {
         ],
       ],
       library('server')
+      ..includeLogger = true
       ..imports = [
         'package:thrift/protocol.dart',
         'package:thrift/transport.dart',
@@ -110,23 +112,34 @@ void main() {
         ..classes = [
           class_('t_processor')
           ..isAbstract = true,
-          class_('t_server_args')
+          class_('t_processor_factory')
+          ..isAbstract = true,
+          class_('t_server_factories')
           ..members = ([
-            member('processor')..type = 'TProcessor',
-            member('server_transport')..type = 'TServerTransport',
+            member('processor_factory')..type = 'TProcessorFactory',
             member('input_transport_factory')..type = 'TTransportFactory',
             member('input_protocol_factory')..type = 'TProtocolFactory',
             member('output_transport_factory')..type = 'TTransportFactory',
             member('output_protocol_factory')..type = 'TProtocolFactory',
           ]..forEach((m) => m.isFinal = true)),
-          class_('t_server_context')
-          ..isAbstract = true,
+          class_('t_connection_context')
+          ..immutable = true
+          ..members = [
+            member('input_protocol')..type = 'TProtocol',
+            member('output_protocol')..type = 'TProtocol',
+          ],
+          class_('t_client_context')
+          ..members = [
+            member('connection_context')..type = 'TConnectionContext',
+          ],
           class_('t_server_event_handler')
           ..isAbstract = true,
           class_('t_server')
           ..isAbstract = true
           ..members = [
-            member('args')..type = 'TServerArgs'..access = RO,
+            member('server_transport')
+            ..type = 'TServerTransport'..access = RO,
+            member('factories')..type = 'TServerFactories'..access = RO,
             member('is_serving')..classInit = false..access = RO,
           ]
         ],
@@ -145,7 +158,9 @@ void main() {
         ..classes = [ class_('t_http_server') ],
       ],
       library('transport')
+      ..includeLogger = true
       ..imports = [
+        'async',
         'io',
       ]
       ..parts = [
@@ -163,24 +178,46 @@ void main() {
           ..members = [
             member('message')
           ],
-          class_('t_transport')..isAbstract = true,
+          class_('t_transport')
+          ..isAbstract = true
+          ..implement = [ 'IOSink', 'Stream' ],
           class_('t_transport_factory'),
-          class_('t_server_transport')..isAbstract = true,
+          class_('t_server_transport_args')
+          ..doc = 'Common arguments for server transports'
+          ..immutable = true
+          ..members = [
+            member('backlog')
+            ..doc = 'Value of 0 idicates the default will be used'
+            ..type = 'int',
+            member('client_timeout')
+            ..type = 'int',
+          ],
+          class_('t_server_transport')
+          ..doc = 'Object which provides client transports'
+          ..immutable = true
+          ..isAbstract = true
+          ..members = [
+            member('args')..type = 'TServerTransportArgs',
+          ]
         ],
         part('socket_transport')
         ..classes = [
           class_('t_socket')
           ..extend = 'TTransport'
           ..members = [
-            member('host'),
-            member('port')..type = 'int',
-            member('is_open')..access = RO..classInit = false,
             member('socket')..access = IA..type = 'Socket',
           ],
           class_('t_server_socket')
+          ..doc = 'Object which provides client transports using sockets'
           ..extend = 'TServerTransport'
           ..members = [
-            member('server_socket')..access = IA..type = 'ServerSocket',
+            member('server_socket')
+            ..doc = '''
+Standard server socket providing client sockets to be wrapped as
+transports.
+'''
+            ..access = RO
+            ..type = 'ServerSocket',
           ]
         ],
         part('ssl_socket_transport'),

@@ -54,9 +54,9 @@ class TBinaryProtocol implements TProtocol {
 
 class TBinaryProtocolFactory implements TProtocolFactory {
   // custom <class TBinaryProtocolFactory>
-  
+
   TProtocol createProtocol(TTransport) => throw 'TODO';
-  
+
   // end <class TBinaryProtocolFactory>
 }
 // custom <part binary>
