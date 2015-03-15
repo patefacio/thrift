@@ -18,7 +18,8 @@ void main() {
     ..doc = 'Package with libraries supporting the Thrift protocol'
     ..testLibraries = [
       library('test_protocol'),
-      library('test_transport'),
+      library('test_transport_io'),
+      library('test_transport_html'),
     ]
     ..libraries = [
       library('protocol')
@@ -157,49 +158,22 @@ void main() {
         part('http')
         ..classes = [ class_('t_http_server') ],
       ],
-      library('transport')
+      library('transport_html')
+      ..includeLogger = true
+      ..imports = [
+        'async',
+        'html',
+        'package:thrift/transport.dart',
+      ]
+      ,
+      library('transport_io')
       ..includeLogger = true
       ..imports = [
         'async',
         'io',
+        'package:thrift/transport.dart',
       ]
       ..parts = [
-        part('transport')
-        ..enums = [
-          enum_('t_exception_type')
-          ..values = [
-            'tet_unknown', 'tet_not_open', 'tet_already_open', 'tet_timed_out', 'tet_end_of_file',
-          ].map((v) => idFromString(v)).toList(),
-        ]
-        ..classes = [
-          class_('t_transport_exception')
-          ..implement = ['Exception']
-          ..immutable = true
-          ..members = [
-            member('message')
-          ],
-          class_('t_transport')
-          ..isAbstract = true
-          ..implement = [ 'IOSink', 'Stream' ],
-          class_('t_transport_factory'),
-          class_('t_server_transport_args')
-          ..doc = 'Common arguments for server transports'
-          ..immutable = true
-          ..members = [
-            member('backlog')
-            ..doc = 'Value of 0 idicates the default will be used'
-            ..type = 'int',
-            member('client_timeout')
-            ..type = 'int',
-          ],
-          class_('t_server_transport')
-          ..doc = 'Object which provides client transports'
-          ..immutable = true
-          ..isAbstract = true
-          ..members = [
-            member('args')..type = 'TServerTransportArgs',
-          ]
-        ],
         part('socket_transport')
         ..classes = [
           class_('t_socket')
@@ -221,6 +195,56 @@ transports.
           ]
         ],
         part('ssl_socket_transport'),
+      ],
+      library('transport')
+      ..includeLogger = true
+      ..imports = [
+        'async',
+      ]
+      ..parts = [
+        part('transport')
+        ..enums = [
+          enum_('t_exception_type')
+          ..values = [
+            'tet_unknown', 'tet_not_open', 'tet_already_open', 'tet_timed_out', 'tet_end_of_file',
+          ].map((v) => idFromString(v)).toList(),
+        ]
+        ..classes = [
+          class_('t_transport_exception')
+          ..implement = ['Exception']
+          ..immutable = true
+          ..members = [
+            member('message')
+          ],
+          class_('t_transport')
+          ..isAbstract = true
+          ..implement = [ ],
+          class_('t_transport_transformer')
+          ..implement = [ 'TTransport' ]
+          ..immutable = true
+          ..isAbstract = true
+          ..members = [
+            member('original')..type = 'TTransport'
+          ],
+          class_('t_transport_factory'),
+          class_('t_server_transport_args')
+          ..doc = 'Common arguments for server transports'
+          ..immutable = true
+          ..members = [
+            member('backlog')
+            ..doc = 'Value of 0 idicates the default will be used'
+            ..type = 'int',
+            member('client_timeout')
+            ..type = 'int',
+          ],
+          class_('t_server_transport')
+          ..doc = 'Object which provides client transports, that is a Stream of Streams'
+          ..immutable = true
+          ..isAbstract = true
+          ..members = [
+            member('args')..type = 'TServerTransportArgs',
+          ]
+        ],
         part('framed_transport'),
       ]
 

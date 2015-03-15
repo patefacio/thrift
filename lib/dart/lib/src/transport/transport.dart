@@ -16,10 +16,26 @@ class TTransportException implements Exception {
   // end <class TTransportException>
 }
 
-abstract class TTransport implements IOSink, Stream {
+abstract class TTransport {
   // custom <class TTransport>
 
+  open();
+  close();
+
+  Stream get stream;
+  Sink get sink;
+
   // end <class TTransport>
+}
+
+abstract class TTransportTransformer implements TTransport {
+  const TTransportTransformer(this.original);
+
+  final TTransport original;
+  // custom <class TTransportTransformer>
+
+
+  // end <class TTransportTransformer>
 }
 
 class TTransportFactory {
@@ -41,12 +57,14 @@ class TServerTransportArgs {
   // end <class TServerTransportArgs>
 }
 
-/// Object which provides client transports
+/// Object which provides client transports, that is a Stream of Streams
 abstract class TServerTransport {
   const TServerTransport(this.args);
 
   final TServerTransportArgs args;
   // custom <class TServerTransport>
+
+  Stream<TTransport> get transports;
 
   TTransport accept() {
     final TTransport result = _accept();
@@ -55,11 +73,6 @@ abstract class TServerTransport {
     }
     return result;
   }
-
-  TTransport _accept();
-
-  void close();
-  void listen();
 
   /// *optional* interrupt method
   void interrupt() {}

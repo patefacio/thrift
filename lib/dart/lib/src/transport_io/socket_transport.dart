@@ -1,4 +1,4 @@
-part of thrift.transport;
+part of thrift.transport_io;
 
 class TSocket extends TTransport {
   // custom <class TSocket>
@@ -7,6 +7,11 @@ class TSocket extends TTransport {
 
   get port => _socket.port;
   get host => _socket.address.host;
+
+  @override
+  Sink get sink => _socket;
+  @override
+  Stream get stream => _socket;
 
   toString() => 'TSocket(host:$host, port: $port)';
 
@@ -34,11 +39,12 @@ class TServerSocket extends TServerTransport {
     return _serverSocket.close();
   }
 
-  listen(accept(TTransport)) {
+  Stream<TTransport> get transports {
     _logger.info('Listening on server socket $_serverSocket');
-    _serverSocket.listen((Socket socket) {
-      _logger.info('Got client socket ${socket.address}');
-      accept(new TSocket(socket));
+    return _serverSocket.map((Socket socket) {
+      final result = new TSocket(socket);
+      _logger.info('Got client socket ${result}');
+      return result;
     });
   }
 
