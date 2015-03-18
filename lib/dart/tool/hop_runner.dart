@@ -15,6 +15,7 @@ void main(List<String> args) {
   //TODO: Figure this out: addTask('docs', createDocGenTask(_getLibs));
   addTask('analyze_test', createAnalyzerTask([
     "test/test_protocol.dart",
+    "test/test_transport.dart",
     "test/test_transport_io.dart",
     "test/test_transport_html.dart"
   ]));

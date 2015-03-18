@@ -18,13 +18,17 @@ void main() {
     ..doc = 'Package with libraries supporting the Thrift protocol'
     ..testLibraries = [
       library('test_protocol'),
+      library('test_transport'),
       library('test_transport_io'),
       library('test_transport_html'),
     ]
     ..libraries = [
       library('protocol')
       ..includeLogger = true
-      ..imports = [ 'package:thrift/transport.dart' ]
+      ..imports = [
+        'package:thrift/transport.dart',
+        'dart:typed_data',
+      ]
       ..parts = [
         part('protocol')
         ..enums = [
@@ -82,7 +86,9 @@ void main() {
         ..classes = [
           class_('t_binary_protocol')..implement = [ 'TProtocol' ]
           ..members = [
-            member('transport')..type = 'TTransport'..access = RO..ctors = ['']
+            member('transport')..type = 'TTransport'..access = IA,
+            member('typed_data')..type = 'TypedData'..access = IA,
+            member('byte_data')..type = 'ByteData'..access = IA,
           ],
           class_('t_binary_protocol_factory')
           ..implement = ['TProtocolFactory'],
@@ -200,6 +206,9 @@ transports.
       ..includeLogger = true
       ..imports = [
         'async',
+        'convert',
+        'typed_data',
+        'collection',
       ]
       ..parts = [
         part('transport')
@@ -218,7 +227,24 @@ transports.
           ],
           class_('t_transport')
           ..isAbstract = true
-          ..implement = [ ],
+          ..members = [
+            member('is_open')..classInit = false..access = RO,
+            member('byte_data')..type = 'ByteData'
+            ..access = IA
+            ..classInit = 'new Uint8List(1).buffer.asByteData()',
+          ],
+          class_('t_memory_transport')
+          ..implement = ['TTransport']
+          ..members = [
+            member('out_data')..type = 'List<int>'..access = RO..classInit = [],
+            member('codec')..type = 'Utf8Codec'..classInit = 'const Utf8Codec()',
+          ],
+          class_('t_loopback_transport')
+          ..extend = 'TTransport'
+          ..members = [
+            member('out_data')..type = 'Queue<int>'..access = RO..classInit = 'new Queue<int>()',
+            //member('codec')..type = 'Utf8Codec'..classInit = 'const Utf8Codec()',
+          ],
           class_('t_transport_transformer')
           ..implement = [ 'TTransport' ]
           ..immutable = true
@@ -226,6 +252,12 @@ transports.
           ..members = [
             member('original')..type = 'TTransport'
           ],
+          // class_('t_buffered_transport')
+          // ..implement = ['TTransport']
+          // ..members = [
+          //   member('original')..type = 'TTransport',
+          //   member('')
+          // ],
           class_('t_transport_factory'),
           class_('t_server_transport_args')
           ..doc = 'Common arguments for server transports'

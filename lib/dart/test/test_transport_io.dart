@@ -27,11 +27,14 @@ main([List<String> args]) {
       print('TPS is $tps');
       tps.listen((TTransport transport) {
         _logger.info('Got transport $transport');
-        transport.sink.write('This is a test');
-        transport.sink.flush();
+        //transport.sink.write('This is a test');
+        for (int i = 0; i < 50000; i++) transport.sink.add([i]);
         _logger.info('Wrote a message');
-      },
-          onError: (e) => print('OOPS got error $e'));
+        transport.sink.flush();
+        _logger.info('Did flush');
+        transport.sink.close();
+        _logger.info('Did close');
+      }, onError: (e) => print('OOPS got error $e'));
 
       // server.listen((TSocket tsocket) async {
       //   _logger.info('Got Tsocket $tsocket');

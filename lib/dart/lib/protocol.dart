@@ -1,5 +1,6 @@
 library thrift.protocol;
 
+import 'dart:typed_data';
 import 'package:logging/logging.dart';
 import 'package:thrift/transport.dart';
 // custom <additional imports>
